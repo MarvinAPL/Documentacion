@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Gallery.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Gallery.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from 'react';
+import styles from '../assets/styles/gallery.module.css';
+
+/**
+ * Componente de galería de imágenes que muestra un conjunto de imágenes. 
+ * Al hacer clic en una imagen, se muestra un texto superpuesto sobre la imagen seleccionada.
+ * 
+ * Incluye:
+ * - Un conjunto de imágenes que pueden ser activadas para mostrar un texto superpuesto.
+ * - Un overlay que cierra la vista de la imagen activa al hacer clic fuera de ella.
+ * 
+ * @returns {JSX.Element} - Elemento JSX que representa la galería de imágenes.
+ */
+const Gallery = () => {
+  const [activeIndex, setActiveIndex] = useState(null);
+
+  /**
+   * Maneja el clic en una imagen, activando o desactivando su visualización.
+   * 
+   * @param {number} index - El índice de la imagen que se ha hecho clic.
+   */
+  const handleImageClick = (index) => {
+    setActiveIndex(index === activeIndex ? null : index);
+  };
+
+  return (
+    &lt;div className={styles.galleryContainer}>
+      {images.map((image, index) => (
+        &lt;div
+          className={`${styles.imageContainer} ${activeIndex === index ? styles.active : ''} ${activeIndex !== null &amp;&amp; activeIndex !== index ? styles.inactive : ''}`}
+          key={index}
+          onClick={() => handleImageClick(index)}
+        >
+          &lt;img src={image.src} alt={`Gallery image ${index + 1}`} className={styles.image} />
+          {activeIndex === index &amp;&amp; (
+            &lt;div className={styles.textOverlay}>
+              &lt;p>{image.text}&lt;/p>
+            &lt;/div>
+          )}
+        &lt;/div>
+      ))}
+      {activeIndex !== null &amp;&amp; (
+        &lt;div className={styles.overlay} onClick={() => setActiveIndex(null)}>&lt;/div>
+      )}
+    &lt;/div>
+  );
+};
+
+export default Gallery;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/Publicate.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/Publicate.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import { useTranslation } from 'react-i18next';
+import styles from '../assets/styles/Publicate.module.css';
+import { Navbar } from '../components/navbar1';
+import { Footer } from '../components/Footer';
+import PaymentButton from '../components/LinkPay'; // Asegúrate de ajustar la ruta al archivo de PaymentButton
+
+/**
+ * Componente para mostrar las opciones de suscripción y permitir a los usuarios elegir un plan de pago.
+ * Incluye una descripción de los planes y un botón de pago para cada uno.
+ *
+ * @component
+ * @example
+ * return (
+ *   &lt;Publicate />
+ * )
+ */
+export function Publicate() {
+  const { t } = useTranslation('Publicate');
+
+  const BASIC_PLAN = 'basic';
+  const PLUS_PLAN = 'plus';
+  const BASIC_AMOUNT = .5;
+  const PLUS_AMOUNT = .5;
+
+  return (
+    &lt;div>
+      &lt;div className={styles.headerContainer}>
+        &lt;div className={styles.navBa}>
+          &lt;Navbar />
+        &lt;/div>
+        &lt;div className={styles.overlay}>&lt;/div>
+        &lt;div className={styles.headerContent}>
+          &lt;h1>{t('header')}&lt;/h1>
+        &lt;/div>
+      &lt;/div>
+      &lt;div className={styles.plancontainer}>
+        &lt;div className={styles.planheader}>
+          &lt;h2>{t('choosePlan')}&lt;/h2>
+        &lt;/div>
+        &lt;div className={styles.plans}>
+          &lt;div className={styles.plan}>
+            &lt;h3>{t('basicSubscription')}&lt;/h3>
+            &lt;p className={styles.planprice}>{t('basicPrice')}&lt;/p>
+            &lt;p>{t('basicDescription')}&lt;/p>
+            &lt;ul>
+              &lt;li>✅ {t('basicFeature1')}&lt;/li>
+              &lt;li>✅ {t('basicFeature2')}&lt;/li>
+              &lt;li>✅ {t('basicFeature3')}&lt;/li>
+              &lt;li>✅ {t('basicFeature4')}&lt;/li>
+              &lt;li>✅ {t('basicFeature5')}&lt;/li>
+            &lt;/ul>
+            &lt;div className={styles.planbutton}>
+              &lt;PaymentButton amount={BASIC_AMOUNT} planType={BASIC_PLAN} />
+            &lt;/div>
+          &lt;/div>
+          &lt;div className={styles.plan}>
+            &lt;h3>{t('plusSubscription')}&lt;/h3>
+            &lt;p className={styles.planprice}>{t('plusPrice')}&lt;/p>
+            &lt;p>{t('plusDescription')}&lt;/p>
+            &lt;ul>
+              &lt;li>✅ {t('plusFeature1')}&lt;/li>
+              &lt;li>✅ {t('plusFeature2')}&lt;/li>
+              &lt;li>✅ {t('plusFeature3')}&lt;/li>
+              &lt;li>✅ {t('plusFeature4')}&lt;/li>
+              &lt;li>✅ {t('plusFeature5')}&lt;/li>
+            &lt;/ul>
+            &lt;div className={styles.planbutton}>
+              &lt;PaymentButton amount={PLUS_AMOUNT} planType={PLUS_PLAN}/>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+      &lt;/div>
+      &lt;Footer />
+    &lt;/div>
+  );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

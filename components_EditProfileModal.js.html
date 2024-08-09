@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/EditProfileModal.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/EditProfileModal.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import Modal from 'react-modal';
+import styles from "../assets/styles/Profiles.module.css";
+// import PropTypes from 'prop-types'; // Descomentar si decides usar PropTypes
+
+/**
+ * Componente de modal para editar el perfil del usuario.
+ * 
+ * Permite al usuario actualizar su nombre, correo electrónico, número de teléfono y foto de perfil.
+ * 
+ * @param {Object} props - Propiedades del componente.
+ * @param {boolean} props.isOpen - Determina si el modal está abierto o cerrado.
+ * @param {function} props.onRequestClose - Función que se llama cuando se solicita cerrar el modal.
+ * @param {Object} props.userDetails - Detalles del usuario (no utilizados directamente en el componente, pero se incluyen para referencia).
+ * @param {string} props.newName - Nombre actualizado del usuario.
+ * @param {function} props.setNewName - Función para actualizar el nombre del usuario.
+ * @param {string} props.newEmail - Correo electrónico actualizado del usuario.
+ * @param {function} props.setNewEmail - Función para actualizar el correo electrónico del usuario.
+ * @param {string} props.newPhone - Número de teléfono actualizado del usuario.
+ * @param {function} props.setNewPhone - Función para actualizar el número de teléfono del usuario.
+ * @param {File} props.newPhoto - Foto de perfil actualizada del usuario.
+ * @param {function} props.setNewPhoto - Función para actualizar la foto de perfil del usuario.
+ * @param {function} props.handleSaveProfile - Función para guardar los cambios realizados en el perfil.
+ * 
+ * @returns {JSX.Element} - Modal para editar el perfil del usuario.
+ */
+const EditProfileModal = ({
+  isOpen,
+  onRequestClose,
+  newName,
+  setNewName,
+  newEmail,
+  setNewEmail,
+  newPhone,
+  setNewPhone,
+  newPhoto,
+  setNewPhoto,
+  handleSaveProfile
+}) => {
+  return (
+    &lt;Modal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      contentLabel="Edit Profile"
+      className={styles.modalContent}
+      overlayClassName={styles.modalOverlay}
+    >
+      &lt;div className={styles.formE}>
+        &lt;h2>Editar Perfil&lt;/h2>
+        
+        &lt;div className={styles.contentI}>
+          &lt;label htmlFor="nameInput">Nombre de usuario&lt;/label>
+          &lt;input
+            id="nameInput"
+            type="text"
+            className={styles.formControl}
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Nuevo nombre"
+          />
+        &lt;/div>
+          
+        &lt;div className={styles.contentI}>
+          &lt;label htmlFor="emailInput">Correo electrónico&lt;/label>
+          &lt;input
+            id="emailInput"
+            type="email"
+            className={styles.formControl}
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            placeholder="Nuevo correo"
+          />
+        &lt;/div>
+
+        &lt;div className={styles.contentI}>
+          &lt;label htmlFor="phoneInput">Número de teléfono&lt;/label>
+          &lt;input
+            id="phoneInput"
+            type="text"
+            className={styles.formControl}
+            value={newPhone}
+            onChange={(e) => setNewPhone(e.target.value)}
+            placeholder="Nuevo teléfono"
+          />
+        &lt;/div>
+
+        &lt;div className={styles.contentI}>
+          &lt;label htmlFor="photoInput">Foto de perfil&lt;/label>
+          &lt;input
+            id="photoInput"
+            type="file"
+            className={`${styles.formControlI} ${styles.fileInput}`}
+            onChange={(e) => setNewPhoto(e.target.files[0])}
+          />
+        &lt;/div>
+        
+        &lt;div className={styles.contentI}>
+          &lt;button className={`${styles.btn1}`} onClick={handleSaveProfile}>
+            Guardar
+          &lt;/button>
+        &lt;/div>
+      &lt;/div>
+    &lt;/Modal>
+  );
+};
+
+// EditProfileModal.propTypes = {
+//   isOpen: PropTypes.bool.isRequired,
+//   onRequestClose: PropTypes.func.isRequired,
+//   newName: PropTypes.string.isRequired,
+//   setNewName: PropTypes.func.isRequired,
+//   newEmail: PropTypes.string.isRequired,
+//   setNewEmail: PropTypes.func.isRequired,
+//   newPhone: PropTypes.string.isRequired,
+//   setNewPhone: PropTypes.func.isRequired,
+//   newPhoto: PropTypes.object.isRequired,
+//   setNewPhoto: PropTypes.func.isRequired,
+//   handleSaveProfile: PropTypes.func.isRequired
+// };
+
+export default EditProfileModal;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

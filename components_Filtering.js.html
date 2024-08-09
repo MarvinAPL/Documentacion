@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Filtering.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Filtering.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import estadosMunicipios from './Location';
+import styles from '../assets/styles/Filtering.module.css';
+
+/**
+ * Componente para filtrar propiedades basado en categoría, precio, estado y municipio.
+ * 
+ * Permite al usuario seleccionar filtros para categoría, precio, estado y municipio, y proporciona
+ * una opción para restablecer todos los filtros.
+ * 
+ * @param {Object} props - Propiedades del componente.
+ * @param {function} props.handleFilter - Función para aplicar los filtros seleccionados.
+ * @param {function} [props.handleReset] - Función opcional para manejar el restablecimiento de filtros.
+ * 
+ * @returns {JSX.Element} - Componente de filtros con selecciones y botón para limpiar filtros.
+ */
+const Filtering = ({ handleFilter, handleReset }) => {
+  const { t } = useTranslation('filtering');
+  const [category, setCategory] = useState('');
+  const [price, setPrice] = useState('');
+  const [state, setState] = useState('');
+  const [city, setCity] = useState('');
+
+  // Use useMemo to memoize municipalities based on selected state
+  const municipalities = useMemo(() => {
+    return state ? estadosMunicipios[state] || [] : [];
+  }, [state]);
+
+  useEffect(() => {
+    handleFilter(category, price, state, city);
+  }, [category, price, state, city, handleFilter]);
+
+  /**
+   * Restablece todos los filtros a sus valores predeterminados.
+   */
+  const resetFilters = () => {
+    setCategory('');
+    setPrice('');
+    setState('');
+    setCity('');
+    handleFilter('', '', '', '');
+    if (handleReset) handleReset();
+  };
+
+  return (
+    &lt;div className={styles.filterBar}>
+      &lt;select
+        className={styles.filterSelect}
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        aria-label={t('filter.category')}
+      >
+        &lt;option value="">{t('filter.category')}&lt;/option>
+        &lt;option value="Terrenos">{t('filter.lands')}&lt;/option>
+        &lt;option value="Residencias">{t('filter.residences')}&lt;/option>
+        &lt;option value="Rentas">{t('filter.rentals')}&lt;/option>
+      &lt;/select>
+
+      &lt;input
+        type="number"
+        className={styles.filterSelect}
+        placeholder={t('filter.maxPrice')}
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        aria-label={t('filter.maxPrice')}
+      />
+
+      &lt;select
+        className={styles.filterSelect}
+        value={state}
+        onChange={(e) => setState(e.target.value)}
+        aria-label={t('filter.state')}
+      >
+        &lt;option value="">{t('filter.state')}&lt;/option>
+        {Object.keys(estadosMunicipios).map((estado) => (
+          &lt;option key={estado} value={estado}>
+            {estado}
+          &lt;/option>
+        ))}
+      &lt;/select>
+
+      &lt;select
+        className={styles.filterSelect}
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
+        aria-label={t('filter.municipality')}
+      >
+        &lt;option value="">{t('filter.municipality')}&lt;/option>
+        {municipalities.map((municipio) => (
+          &lt;option key={municipio} value={municipio}>
+            {municipio}
+          &lt;/option>
+        ))}
+      &lt;/select>
+
+      &lt;button className={styles.filterButton} onClick={resetFilters} aria-label={t('filter.clearFilters')}>
+        {t('filter.clearFilters')}
+      &lt;/button>
+    &lt;/div>
+  );
+};
+
+export default Filtering;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Publications.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Publications.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from 'react';
+import { db, auth, storage } from '../firebase/config';
+import { addDoc, collection, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Modal from 'react-modal';
+import styles from '../assets/styles/Modal.module.css';
+import estadosMunicipios from './Location';
+
+/**
+ * Componente para publicar un nuevo documento en una colección de Firestore.
+ * Permite a los usuarios subir una imagen de portada, imágenes adicionales y completar un formulario.
+ * 
+ * @param {Object} props - Props del componente.
+ * @param {string} props.collectionName - Nombre de la colección en Firestore en la que se guardará el nuevo documento.
+ * @param {Array&lt;{ 
+ *    name: string, 
+ *    label: string, 
+ *    type: string, 
+ *    required: boolean, 
+ *    options?: Array&lt;{ value: string, label: string }> 
+ * }>} props.fields - Campos del formulario a renderizar.
+ * @param {boolean} props.modalIsOpen - Estado que indica si el modal está abierto.
+ * @param {Function} props.closeModal - Función para cerrar el modal.
+ * @returns {JSX.Element} - Renderiza un modal con un formulario para publicar un nuevo documento.
+ * 
+ * @example
+ * &lt;Publicate
+ *   collectionName="products"
+ *   fields={[
+ *     { name: 'title', label: 'Title', type: 'text', required: true },
+ *     { name: 'description', label: 'Description', type: 'text', required: true },
+ *     { name: 'category', label: 'Category', type: 'select', required: true, options: [{ value: 'electronics', label: 'Electronics' }, { value: 'furniture', label: 'Furniture' }] },
+ *     { name: 'state', label: 'State', type: 'select', required: true },
+ *     { name: 'city', label: 'City', type: 'select', required: true }
+ *   ]}
+ *   modalIsOpen={isModalOpen}
+ *   closeModal={closeModal}
+ * />
+ */
+const Publicate = ({ collectionName, fields, modalIsOpen, closeModal }) => {
+  const [formData, setFormData] = useState({});
+  const [imageFile, setImageFile] = useState(null);
+  const [additionalImages, setAdditionalImages] = useState([]);
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+
+  /**
+   * Maneja los cambios en los campos del formulario.
+   * 
+   * @param {React.ChangeEvent&lt;HTMLInputElement>} e - Evento de cambio del formulario.
+   */
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  /**
+   * Maneja el cambio de la imagen de portada.
+   * 
+   * @param {React.ChangeEvent&lt;HTMLInputElement>} e - Evento de cambio del input de archivo.
+   */
+  const handleImageChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
+  /**
+   * Maneja el cambio de las imágenes adicionales.
+   * 
+   * @param {React.ChangeEvent&lt;HTMLInputElement>} e - Evento de cambio del input de archivos múltiples.
+   */
+  const handleAdditionalImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + additionalImages.length > 10) {
+      alert('No puedes subir más de 10 imágenes adicionales.');
+      return;
+    }
+    setAdditionalImages([...additionalImages, ...files]);
+  };
+
+  /**
+   * Maneja el envío del formulario y guarda los datos en Firestore.
+   * 
+   * @param {React.FormEvent&lt;HTMLFormElement>} e - Evento de envío del formulario.
+   */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const user = auth.currentUser;
+
+    if (!user || !user.uid) {
+      console.error('Usuario no autenticado o UID no disponible');
+      return;
+    }
+
+    try {
+      let image = '';
+      if (imageFile) {
+        const storageRef = ref(storage, `${collectionName}/portada/${imageFile.name}`);
+        const snapshot = await uploadBytes(storageRef, imageFile);
+        image = await getDownloadURL(snapshot.ref);
+      }
+
+      const additionalImagesUrls = [];
+      for (const file of additionalImages) {
+        const storageRef = ref(storage, `${collectionName}/imagenes/${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+        additionalImagesUrls.push(url);
+      }
+
+      const docRef = await addDoc(collection(db, collectionName), {
+        ...formData,
+        userId: user.uid,
+        userName: user.displayName,
+        image: image,
+        additionalImages: additionalImagesUrls,
+        createdAt: serverTimestamp(),
+      });
+
+      console.log('Documento creado correctamente: ', docRef.id);
+      await updateDoc(docRef, { id: docRef.id });
+
+      setFormData({});
+      setImageFile(null);
+      setAdditionalImages([]);
+      closeModal();
+      window.location.reload();
+    } catch (err) {
+      console.error('Error al guardar en Firestore: ', err);
+    }
+  };
+
+  /**
+   * Maneja el cambio en el estado seleccionado.
+   * 
+   * @param {React.ChangeEvent&lt;HTMLSelectElement>} e - Evento de cambio del select del estado.
+   */
+  const handleChangeState = (e) => {
+    const state = e.target.value;
+    setSelectedState(state);
+    setSelectedCity('');
+    setFormData({
+      ...formData,
+      state: state,
+      city: '',
+    });
+  };
+
+  /**
+   * Maneja el cambio en la ciudad seleccionada.
+   * 
+   * @param {React.ChangeEvent&lt;HTMLSelectElement>} e - Evento de cambio del select de la ciudad.
+   */
+  const handleChangeCity = (e) => {
+    const city = e.target.value;
+    setSelectedCity(city);
+    setFormData({
+      ...formData,
+      city: city,
+    });
+  };
+
+  return (
+    &lt;Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      contentLabel={`Nuevo ${collectionName}`}
+      className={styles.modal}
+      overlayClassName={styles.modalOverlay}
+    >
+      &lt;div>
+        &lt;h2>Nuevo {collectionName}&lt;/h2>
+        &lt;form onSubmit={handleSubmit}>
+          {fields.map((field) => (
+            &lt;div key={field.name} className={styles['form-group']}>
+              &lt;label htmlFor={field.name}>{field.label}&lt;/label>
+              
+              {field.type === 'select' &amp;&amp; field.name === 'state' &amp;&amp; (
+                &lt;select
+                  className={styles['form-control']}
+                  id={field.name}
+                  name={field.name}
+                  value={selectedState}
+                  onChange={handleChangeState}
+                  required={field.required}
+                >
+                  &lt;option value="">Selecciona un estado&lt;/option>
+                  {Object.keys(estadosMunicipios).map((estado) => (
+                    &lt;option key={estado} value={estado}>
+                      {estado}
+                    &lt;/option>
+                  ))}
+                &lt;/select>
+              )}
+
+              {field.type === 'select' &amp;&amp; field.name === 'city' &amp;&amp; (
+                &lt;select
+                  className={styles['form-control']}
+                  id={field.name}
+                  name={field.name}
+                  value={selectedCity}
+                  onChange={handleChangeCity}
+                  required={field.required}
+                  disabled={!selectedState}
+                >
+                  &lt;option value="">Selecciona una ciudad&lt;/option>
+                  {selectedState &amp;&amp;
+                    estadosMunicipios[selectedState].map((city) => (
+                      &lt;option key={city} value={city}>
+                        {city}
+                      &lt;/option>
+                    ))}
+                &lt;/select>
+              )}
+
+              {field.type === 'select' &amp;&amp; field.name === 'category' &amp;&amp; (
+                &lt;select
+                  className={styles['form-control']}
+                  id={field.name}
+                  name={field.name}
+                  value={formData[field.name] || ''}
+                  onChange={handleChange}
+                  required={field.required}
+                >
+                  {field.options.map((option) => (
+                    &lt;option key={option.value} value={option.value}>
+                      {option.label}
+                    &lt;/option>
+                  ))}
+                &lt;/select>
+              )}
+
+              {field.type !== 'select' &amp;&amp; field.name !== 'state' &amp;&amp; field.name !== 'city' &amp;&amp; (
+                &lt;input
+                  type={field.type}
+                  className={styles['form-control']}
+                  id={field.name}
+                  name={field.name}
+                  value={formData[field.name] || ''}
+                  onChange={handleChange}
+                  required={field.required}
+                />
+              )}
+            &lt;/div>
+          ))}
+          &lt;div className={styles['form-group']}>
+            &lt;label htmlFor="coverImage">Imagen de Portada&lt;/label>
+            &lt;input
+              type="file"
+              className={styles['form-control']}
+              id="coverImage"
+              name="coverImage"
+              accept="image/*"
+              onChange={handleImageChange}
+              required
+            />
+          &lt;/div>
+          &lt;div className={styles['form-group']}>
+            &lt;label htmlFor="additionalImages">Imágenes Adicionales&lt;/label>
+            &lt;input
+              type="file"
+              className={styles['form-control']}
+              id="additionalImages"
+              name="additionalImages"
+              accept="image/*"
+              multiple
+              onChange={handleAdditionalImagesChange}
+            />
+          &lt;/div>
+
+          &lt;button type="submit" className={styles['btn btn-primary']}>
+            Guardar
+          &lt;/button>
+        &lt;/form>
+      &lt;/div>
+    &lt;/Modal>
+  );
+};
+
+export default Publicate;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

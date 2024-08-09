@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/AffiliateAgencies.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/AffiliateAgencies.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// Importaciones de componentes, estilos y funciones
+import { Navbar } from '../components/navbar1'; // Componente de la barra de navegación
+import { Footer } from '../components/Footer'; // Componente del pie de página
+import styles from '../assets/styles/Affiliate.module.css'; // Estilos específicos para la página Affiliate
+import Filtering from '../components/Filtering'; // Componente para filtrar resultados
+import { useAuth } from '../components/statusUser'; // Hook para verificar el estado de autenticación
+import { useEffect, useState } from 'react'; // Hooks de React para manejar estado y efectos
+import pedirObjetos from '../components/pedirObjetos'; // Función para obtener datos de Firestore
+import ItemList from '../components/ItemList'; // Componente para mostrar una lista de objetos
+import Publicate from '../components/Publications'; // Componente para la publicación de nuevos objetos
+import { db } from '../firebase/config'; // Configuración de Firebase
+import { collection, query, where, getDocs } from 'firebase/firestore'; // Funciones de Firestore para consultar documentos
+import { useTranslation } from 'react-i18next'; // Hook para la traducción de textos
+
+/**
+ * Componente AffiliateAgencies - Página para gestionar agencias afiliadas
+ * 
+ * Este componente representa la página "AffiliateAgencies", que permite filtrar y mostrar 
+ * una lista de agencias afiliadas, así como agregar nuevas agencias. Incluye una barra 
+ * de navegación, un filtro, una lista de agencias y un modal para agregar nuevas agencias.
+ * 
+ * @returns {JSX.Element} - Retorna el JSX para renderizar la página.
+ */
+export function AffiliateAgencies() {
+  // Estado para controlar la visibilidad del modal
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  // Estado para almacenar los objetos obtenidos
+  const [objetos, setObjetos] = useState([]);
+  // Estado para almacenar las agencias filtradas
+  const [filteredAgencies, setFilteredAgencies] = useState([]);
+  // Hook para verificar si el usuario está autenticado
+  const { isLoggedIn } = useAuth();
+  // Hook para la traducción de textos
+  const { t } = useTranslation('afiliate');
+
+  /**
+   * Abre el modal para agregar nuevas agencias y deshabilita el scroll de la página.
+   */
+  const openModal = () => {
+    setModalIsOpen(true);
+    document.body.style.overflow = 'hidden'; // Deshabilita el scroll
+  };
+
+  /**
+   * Cierra el modal y habilita el scroll de la página.
+   */
+  const closeModal = () => {
+    setModalIsOpen(false);
+    document.body.style.overflow = 'auto'; // Habilita el scroll
+  };
+
+  /**
+   * Obtiene las agencias desde Firestore y establece los estados correspondientes.
+   */
+  useEffect(() => {
+    const collectionName = "Agencies";
+    pedirObjetos(collectionName)
+      .then((res) => {
+        setObjetos(res);
+        setFilteredAgencies(res); // Inicialmente muestra todos los proyectos
+      })
+      .catch((err) => {
+        setObjetos([]);
+        setFilteredAgencies([]);
+      })
+  }, [])
+
+  /**
+   * Filtra las agencias según los criterios proporcionados.
+   * 
+   * @param {string} category - Categoría de las agencias.
+   * @param {number} price - Precio máximo de las agencias.
+   * @param {string} state - Estado de las agencias.
+   * @param {string} city - Ciudad de las agencias.
+   */
+  const handleFilter = async (category, price, state, city) => {
+    const projectCollection = collection(db, 'Agencies');
+    let q = query(projectCollection);
+
+    if (category) {
+      q = query(q, where('category', '==', category));
+    }
+    if (price) {
+      q = query(q, where('price', '&lt;=', parseFloat(price)));
+    }
+    if (state) {
+      q = query(q, where('state', '==', state));
+    }
+    if (city) {
+      q = query(q, where('city', '==', city));
+    }
+
+    const snapshot = await getDocs(q);
+    const Agencies = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setFilteredAgencies(Agencies);
+  };
+
+  /**
+   * Restablece la lista de agencias filtradas a la lista completa de objetos.
+   */
+  const handleReset = () => {
+    setFilteredAgencies(objetos);
+  };
+
+  // Configuración de campos a mostrar en la lista
+  const displayFields = {
+    image: true,
+    title: true,
+    description: false,
+    city: true,
+    state: false,
+    direction: false,
+    category: false,
+    price: true,
+    userName: true,
+    additionalImages: true
+  }
+
+  return (
+    &lt;div>
+      {/* Contenedor del encabezado */}
+      &lt;div className={styles.headerContainer}>
+        {/* Barra de navegación */}
+        &lt;div className={styles.navBa}>
+          &lt;Navbar />
+        &lt;/div>
+        {/* Capa de superposición para efectos visuales */}
+        &lt;div className={styles.overlay}>&lt;/div>
+        {/* Contenido del encabezado */}
+        &lt;div className={styles.headerContent}>
+          &lt;h1>{t('header.title')}&lt;/h1> {/* Título principal */}
+        &lt;/div>
+      &lt;/div>
+
+      {/* Componente de filtrado */}
+      &lt;Filtering handleFilter={handleFilter} handleReset={handleReset} />
+
+      {/* Lista de agencias */}
+      &lt;ItemList objetos={filteredAgencies} displayFields={displayFields} collectionName="Agencies" />
+      
+      {/* Componente para agregar nuevas agencias */}
+      &lt;Publicate
+        collectionName="Agencies"
+        fields={[
+          { name: 'title', label: t('publicate.fields.title'), type: 'text', required: true },
+          {
+            name: 'category', label: t('publicate.fields.category.label'), type: 'select', required: true, options: t('publicate.fields.category.options', { returnObjects: true })
+          },
+          { name: 'price', label: t('publicate.fields.price'), type: 'number', required: true },
+          { name: 'state', label: t('publicate.fields.state'), type: 'select', required: true },
+          { name: 'city', label: t('publicate.fields.city'), type: 'select', required: true },
+          { name: 'description', label: t('publicate.fields.description'), type: 'text', required: true },
+        ]}
+        modalIsOpen={modalIsOpen}
+        closeModal={closeModal}
+      />
+      
+      {/* Pie de página */}
+      &lt;Footer />
+    &lt;/div>
+  )
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Footer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Footer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import styles from '../assets/styles/Footer.module.css';
+import { FaFacebookF, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+
+/**
+ * Componente de pie de página (footer) que muestra el logotipo de la empresa, enlaces a redes sociales y enlaces de navegación.
+ * 
+ * Incluye:
+ * - Un logotipo con enlace a la página principal.
+ * - Iconos de redes sociales con enlaces a las respectivas páginas.
+ * - Enlaces de navegación a las secciones "Sobre nosotros", "Proyectos" y "Contacto".
+ * - Un aviso de derechos de autor y un enlace a la política de privacidad.
+ * 
+ * @returns {JSX.Element} - Elemento JSX que representa el pie de página.
+ */
+export function Footer() {
+    const { t } = useTranslation('footer');
+    const whatsappNumber = '+5214272777080';  // Corregido el número de WhatsApp
+
+    return (
+        &lt;footer className={styles.footer}>
+            &lt;div className={styles.footerTop}>
+                &lt;div className={styles.footerLogo}>
+                    &lt;a href='/'>&lt;img src='logo.png' alt="Logotipo de SHEKSA Construcciones" width="150" />&lt;/a>
+                &lt;/div>
+                &lt;div className={styles.footerSocial}>
+                    &lt;a href="https://www.facebook.com/sheksaconstrucciones" target="_blank" rel="noopener noreferrer">&lt;FaFacebookF />&lt;/a>
+                    &lt;a href="https://www.linkedin.com/in/erick-tripp-8534b7250/?original_referer=https%3A%2F%2Fwww%2Egoogle%2Ecom%2F&amp;originalSubdomain=mx" target="_blank" rel="noopener noreferrer">&lt;FaLinkedinIn />&lt;/a>
+                    &lt;a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer">&lt;FaWhatsapp />&lt;/a>
+                &lt;/div>
+                &lt;nav className={styles.footerInfo}>
+                    &lt;a href='/about'>{t('about_us')}&lt;/a>
+                    &lt;a href='/projects'>{t('projects')}&lt;/a>
+                    &lt;a href='/contact'>{t('contact')}&lt;/a>
+                &lt;/nav>
+            &lt;/div>
+            &lt;div className={styles.footerBottom}>
+                &lt;p>&amp;copy; 2024 SHEKSA Construcciones, S.A DE C.V | &lt;a href="#">{t('privacy_policy')}&lt;/a>&lt;/p>
+            &lt;/div>
+        &lt;/footer>
+    );
+}
+
+export default Footer;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: StatusPay.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: StatusPay.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { getAuth } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
+
+/**
+ * Componente para verificar el estado del pago.
+ * 
+ * Este componente consulta el estado del pago en intervalos regulares y actualiza el estado del usuario en Firestore
+ * cuando el pago se completa exitosamente. También muestra un mensaje de estado en la interfaz.
+ * 
+ * @param {Object} props - Props del componente.
+ * @param {Function} props.setPaymentStatus - Función para actualizar el estado del pago en el componente padre.
+ * 
+ * @returns {JSX.Element} - Renderiza un mensaje de estado del pago.
+ */
+const VerifyPaymentStatus = ({ setPaymentStatus }) => {
+  const [statusMessage, setStatusMessage] = useState('');
+  const [intervalId, setIntervalId] = useState(null); // Para guardar el ID del intervalo
+  const [isPaymentVerified, setIsPaymentVerified] = useState(false); // Nuevo estado para verificar si el pago ya ha sido comprobado
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  /**
+   * Verifica el estado del pago consultando la API de Payclip.
+   * Actualiza el estado del usuario en Firestore si el pago se completa.
+   */
+  const verifyPaymentStatus = async () => {
+    if (!user) {
+      console.error('No user is logged in.');
+      return;
+    }
+
+    const paymentRequestId = localStorage.getItem('paymentRequestId');
+    const purchaseDescription = localStorage.getItem('purchaseDescription'); // Recupera la descripción
+    if (!paymentRequestId) {
+      console.error('Payment Request ID not found.');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`https://api-gw.payclip.com/checkout/${paymentRequestId}`, {
+        headers: {
+          accept: 'application/vnd.com.payclip.v2+json',
+          'x-api-key': 'Basic Y2M5NWJhMDktZGZiYS00YTNhLThlNDAtMjRiMjViYzJhZmNiOjZhY2JjZjI1LTg3NjctNDZlZi1iMGU4LTA5OTk3ZGNiOGQyOA==',
+        },
+      });
+
+      const { status, metadata } = response.data;
+      const { me_reference_id } = metadata;
+
+      if (me_reference_id !== user.uid) {
+        setStatusMessage('El ID de referencia no coincide con el usuario actual.');
+        return;
+      }
+
+      if (isPaymentVerified) {
+        return; // No hacer nada si el pago ya ha sido verificado
+      }
+
+      switch (status) {
+        case 'CHECKOUT_COMPLETED':
+          setStatusMessage('El pago se completó exitosamente.');
+          if (setPaymentStatus) {
+            setPaymentStatus(status); // Llama a la función para actualizar el estado del pago
+          }
+
+          const userRef = doc(db, 'Users', user.uid);
+          await updateDoc(userRef, { 
+            subscriptionStartDate: new Date(), // Guardar la fecha actual como la fecha de inicio de la suscripción
+            subscription: true,
+            typeSubscription: purchaseDescription // Actualiza el campo typeSubscription con la descripción almacenada
+          });
+          console.log('Campo subscription y typeSubscription actualizado correctamente.');
+
+          // Limpiar el intervalo y establecer que el pago ya ha sido verificado
+          if (intervalId) {
+            clearInterval(intervalId);
+          }
+          setIsPaymentVerified(true);
+          break;
+
+        case 'CHECKOUT_PENDING':
+          setStatusMessage('El enlace de pago está activo y esperando pago.');
+          break;
+
+        case 'CHECKOUT_CANCELLED':
+          setStatusMessage('El enlace de pago fue cancelado debido a intentos fallidos.');
+          break;
+
+        case 'CHECKOUT_EXPIRED':
+          setStatusMessage('El enlace de pago ha expirado. Por favor, genere un nuevo enlace.');
+          break;
+
+        default:
+          setStatusMessage('Espere unos momentos en lo que el estado del pago cambia');
+          break;
+      }
+    } catch (error) {
+      console.error('Error al consultar el estado del pago:', error);
+      setStatusMessage('Error al consultar el estado del pago.');
+    }
+  };
+
+  useEffect(() => {
+    // Establece un intervalo para verificar el estado cada 10 segundos (10000 ms)
+    const id = setInterval(verifyPaymentStatus, 10000);
+    setIntervalId(id);
+
+    // Limpia el intervalo cuando el componente se desmonte o el estado sea CHECKOUT_COMPLETED
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (statusMessage === 'El pago se completó exitosamente.') {
+      // Limpiar el intervalo si el estado es CHECKOUT_COMPLETED
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+      setIsPaymentVerified(true); // Marca el pago como verificado
+    }
+  }, [statusMessage, intervalId]);
+
+  return (
+    &lt;div>
+      {statusMessage &amp;&amp; &lt;p>{statusMessage}&lt;/p>}
+    &lt;/div>
+  );
+};
+
+export default VerifyPaymentStatus;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 17:42:05 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

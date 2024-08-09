@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/Details.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/Details.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect, useState } from 'react'; // Importa React y hooks
+import { useParams } from 'react-router-dom'; // Hook para obtener parámetros de la URL
+import { db } from '../firebase/config'; // Importa la configuración de Firebase
+import { doc, getDoc } from 'firebase/firestore'; // Funciones de Firestore para obtener documentos
+import styles from '../assets/styles/infoExtra.module.css'; // Importa estilos específicos para el componente
+import { Carousel } from 'react-responsive-carousel'; // Importa el componente Carousel
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // Importa los estilos del carrusel
+
+/**
+ * Componente Details - Muestra los detalles de un documento específico
+ * 
+ * Este componente se encarga de recuperar y mostrar detalles de un documento
+ * basado en el ID de la URL y la colección especificada. Utiliza un carrusel para
+ * mostrar imágenes y presenta campos de detalle específicos para cada tipo de colección.
+ * 
+ * @param {Object} props - Propiedades del componente.
+ * @param {string} props.collection - Nombre de la colección en Firestore.
+ * @returns {JSX.Element} - Retorna el JSX para renderizar los detalles del documento.
+ */
+export function Details({ collection }) {
+    const { id } = useParams(); // Obtiene el ID del documento de la URL
+    const [details, setDetails] = useState(null); // Estado para almacenar los detalles del documento
+
+    /**
+     * Recupera los detalles del documento desde Firestore.
+     */
+    useEffect(() => {
+        const fetchDetails = async () => {
+            console.log('Fetching details...');
+            try {
+                const docRef = doc(db, collection, id); // Referencia al documento
+                const docSnap = await getDoc(docRef); // Obtiene el documento
+                console.log('Document fetched:', docSnap.exists(), docSnap.data());
+                if (docSnap.exists()) {
+                    setDetails(docSnap.data()); // Actualiza el estado con los datos del documento
+                } else {
+                    console.log(`No se encontró el documento en la colección ${collection}.`);
+                }
+            } catch (error) {
+                console.error(`Error al obtener detalles de ${collection}:`, error); // Manejo de errores
+            }
+        };
+    
+        fetchDetails(); // Llama a la función para recuperar los detalles
+    }, [collection, id]); // Dependencias: vuelve a ejecutarse si cambia collection o id
+
+    if (!details) {
+        console.log('Loading details...');
+        return &lt;p>Cargando...&lt;/p>; // Mensaje de carga mientras se obtienen los detalles
+    }
+
+    console.log('Detalles:', details);
+
+    // Define los campos a mostrar para cada tipo de colección
+    const displayFields = {
+        Projects: [
+            { key: 'title', label: 'Título' },
+            { key: 'price', label: 'Precio' },
+            { key: 'city', label: 'Ciudad' },
+            { key: 'state', label: 'Estado' },
+            { key: 'category', label: 'Categoria' },
+            { key: 'description', label: 'Descripción' },
+            { key: 'userName', label: 'Empresa' },
+            // Agrega más campos específicos de Projects según sea necesario
+        ],
+        News: [
+            { key: 'title', label: 'Título' },
+            { key: 'description', label: 'Descripcion' },
+            // Agrega más campos específicos de News según sea necesario
+        ],
+        Agencies: [
+            { key: 'title', label: 'Título' },
+            { key: 'price', label: 'Precio' },
+            { key: 'category', label: 'Categoria' },
+            { key: 'city', label: 'Ciudad' },
+            { key: 'state', label: 'Estado' },
+            { key: 'description', label: 'Descripcion' },
+            { key: 'userName', label: 'De: ' },
+            // Agrega más campos específicos de Agencies según sea necesario
+        ]
+    };
+
+    // Prepara las imágenes para el carrusel
+    const images = details.additionalImages ? [details.image, ...details.additionalImages] : [details.image];
+    console.log('Imágenes:', images);
+    console.log('Esta es la coleccion', collection);
+    console.log('Campos a mostrar:', displayFields[collection]); // Verifica los campos a mostrar
+    
+
+    return (
+        &lt;div className={styles.containerAI}>
+            &lt;div className={styles.card}>
+                &lt;div className={styles.cardImage}>
+                    {/* Carrusel para mostrar imágenes */}
+                    &lt;Carousel showThumbs={false} dynamicHeight={true}>
+                        {images.map((img, index) => (
+                            &lt;div key={index}>
+                                &lt;img src={img || '/sk1.jpg'} alt={`Imagen ${index}`} />
+                            &lt;/div>
+                        ))}
+                    &lt;/Carousel>
+                &lt;/div>
+                &lt;div className={styles.cardContent}>
+                    &lt;h2 className={styles.title}>Detalles&lt;/h2>
+                    {/* Muestra los campos de detalle según la colección */}
+                    {displayFields[collection]?.map(field => (
+                        &lt;p key={field.key} className={styles.description}>
+                            {field.label}: {details[field.key] || 'N/A'}
+                        &lt;/p>
+                    ))}
+                &lt;/div>
+            &lt;/div>
+        &lt;/div>
+    );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

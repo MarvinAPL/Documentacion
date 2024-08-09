@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/News.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/News.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { Navbar } from '../components/navbar1';
+import { Footer } from '../components/Footer';
+import { useEffect, useState } from 'react';
+import pedirObjetos from '../components/pedirObjetos';
+import ItemList from '../components/ItemList';
+import styles from "../assets/styles/News.module.css";
+import Publicate from '../components/Publications';
+import { useAuth } from '../components/statusUser';
+import { useTranslation } from 'react-i18next';
+
+/**
+ * Componente para mostrar noticias y permitir a los administradores agregar nuevas.
+ *
+ * @component
+ * @example
+ * return (
+ *   &lt;News />
+ * )
+ */
+const News = () => {
+    const [modalIsOpen, setModalIsOpen] = useState(false); // Estado para controlar la visibilidad del modal
+    const [objetos, setObjetos] = useState([]); // Estado para almacenar los objetos de la colección "News"
+    const { isAdmin } = useAuth(); // Hook personalizado para obtener el estado de autenticación del usuario
+    const { t } = useTranslation('news'); // Hook de traducción para el namespace 'news'
+
+    /**
+     * Abre el modal para agregar una nueva noticia.
+     */
+    const openModal = () => setModalIsOpen(true);
+
+    /**
+     * Cierra el modal.
+     */
+    const closeModal = () => setModalIsOpen(false);
+
+    useEffect(() => {
+        const collectionName = "News";
+        pedirObjetos(collectionName)
+            .then((res) => {
+                setObjetos(res);
+            })
+            .catch((err) => {
+                setObjetos([]);
+            });
+    }, []);
+
+    /**
+     * Campos a mostrar en el componente ItemList.
+     * 
+     * @type {Object}
+     * @property {boolean} image - Si se debe mostrar la imagen.
+     * @property {boolean} title - Si se debe mostrar el título.
+     * @property {boolean} description - Si se debe mostrar la descripción.
+     * @property {boolean} city - Si se debe mostrar la ciudad.
+     * @property {boolean} state - Si se debe mostrar el estado.
+     * @property {boolean} direction - Si se debe mostrar la dirección.
+     * @property {boolean} category - Si se debe mostrar la categoría.
+     * @property {boolean} price - Si se debe mostrar el precio.
+     */
+    const displayFields = {
+        image: true,
+        title: true,
+        description: false,
+        city: false,
+        state: false,
+        direction: false,
+        category: false,
+        price: false
+    };
+
+    const collectionName = "News";
+
+    return (
+        &lt;div>
+            &lt;div className={styles.headerContainer}>
+                &lt;div className={styles.navBa}>
+                    &lt;Navbar />
+                &lt;/div>
+                &lt;div className={styles.overlay}>&lt;/div>
+                &lt;div className={styles.headerContent}>
+                    &lt;h1>{t('novelties')}&lt;/h1>
+                &lt;/div>
+            &lt;/div>
+            
+            {isAdmin &amp;&amp; (
+                &lt;button onClick={openModal} className="btn btn-primary">
+                    {t('add_new_project')}
+                &lt;/button>
+            )}
+            &lt;ItemList objetos={objetos} displayFields={displayFields} collectionName={collectionName}/>
+            &lt;Publicate
+                collectionName="News"
+                fields={[
+                    { name: 'title', label: t('title'), type: 'text', required: true },
+                    { name: 'description', label: t('description'), type: 'text', required: true },
+                    // Agrega más campos según sea necesario
+                ]}
+                modalIsOpen={modalIsOpen}
+                closeModal={closeModal}
+            />
+            &lt;Footer />
+        &lt;/div>
+    );
+}
+
+export default News;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

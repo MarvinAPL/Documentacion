@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Location.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Location.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Un objeto que contiene la lista de municipios o ciudades para cada estado de México.
+ * 
+ * @type {Object&lt;string, string[]>}
+ * @property {string[]} Aguascalientes - Lista de municipios en Aguascalientes.
+ * @property {string[]} BajaCalifornia - Lista de municipios en Baja California.
+ * @property {string[]} BajaCaliforniaSur - Lista de municipios en Baja California Sur.
+ * @property {string[]} Campeche - Lista de municipios en Campeche.
+ * @property {string[]} Chiapas - Lista de municipios en Chiapas.
+ * @property {string[]} Chihuahua - Lista de municipios en Chihuahua.
+ * @property {string[]} Coahuila - Lista de municipios en Coahuila.
+ * @property {string[]} Colima - Lista de municipios en Colima.
+ * @property {string[]} Durango - Lista de municipios en Durango.
+ * @property {string[]} Guanajuato - Lista de municipios en Guanajuato.
+ * @property {string[]} Guerrero - Lista de municipios en Guerrero.
+ * @property {string[]} Hidalgo - Lista de municipios en Hidalgo.
+ * @property {string[]} Jalisco - Lista de municipios en Jalisco.
+ * @property {string[]} México - Lista de municipios en Estado de México.
+ * @property {string[]} Michoacán - Lista de municipios en Michoacán.
+ * @property {string[]} Morelos - Lista de municipios en Morelos.
+ * @property {string[]} Nayarit - Lista de municipios en Nayarit.
+ * @property {string[]} NuevoLeón - Lista de municipios en Nuevo León.
+ * @property {string[]} Oaxaca - Lista de municipios en Oaxaca.
+ * @property {string[]} Puebla - Lista de municipios en Puebla.
+ * @property {string[]} Querétaro - Lista de municipios en Querétaro.
+ * @property {string[]} QuintanaRoo - Lista de municipios en Quintana Roo.
+ * @property {string[]} SanLuisPotosí - Lista de municipios en San Luis Potosí.
+ * @property {string[]} Sinaloa - Lista de municipios en Sinaloa.
+ * @property {string[]} Sonora - Lista de municipios en Sonora.
+ * @property {string[]} Tabasco - Lista de municipios en Tabasco.
+ * @property {string[]} Tamaulipas - Lista de municipios en Tamaulipas.
+ * @property {string[]} Tlaxcala - Lista de municipios en Tlaxcala.
+ * @property {string[]} Veracruz - Lista de municipios en Veracruz.
+ * @property {string[]} Yucatán - Lista de municipios en Yucatán.
+ * @property {string[]} Zacatecas - Lista de municipios en Zacatecas.
+ */
+const estadosMunicipios = {
+  Aguascalientes: ['Aguascalientes', 'Asientos', 'Calvillo', 'Cosío', 'Jesús María', 'Pabellón de Arteaga', 'Rincón de Romos', 'San José de Gracia', 'Tepezalá', 'El Llano'],
+  BajaCalifornia: ['Ensenada', 'Mexicali', 'Tecate', 'Tijuana', 'Playas de Rosarito'],
+  BajaCaliforniaSur: ['La Paz', 'Los Cabos', 'Comondú', 'Loreto', 'Mulegé'],
+  Campeche: ['Campeche', 'Calkiní', 'Carmen', 'Champotón', 'Hecelchakán', 'Hopelchén', 'Palizada', 'Tenabo', 'Escárcega'],
+  Chiapas: ['Tuxtla Gutiérrez', 'Tapachula', 'San Cristóbal de las Casas', 'Comitán de Domínguez', 'Chiapa de Corzo', 'Villaflores', 'Tonalá', 'Palenque', 'Ocosingo'],
+  Chihuahua: ['Chihuahua', 'Juárez', 'Cuauhtémoc', 'Delicias', 'Parral', 'Nuevo Casas Grandes', 'Camargo', 'Meoqui', 'Jiménez'],
+  Coahuila: ['Saltillo', 'Torreón', 'Monclova', 'Piedras Negras', 'Acuña', 'Matamoros', 'San Pedro', 'Francisco I. Madero', 'Frontera'],
+  Colima: ['Colima', 'Manzanillo', 'Tecomán', 'Villa de Álvarez'],
+  Durango: ['Durango', 'Gómez Palacio', 'Lerdo', 'Ciudad Lerdo', 'Torreón', 'Santiago Papasquiaro', 'Guadalupe Victoria', 'Nuevo Ideal'],
+  Guanajuato: ['Guanajuato', 'León', 'Irapuato', 'Salamanca', 'Celaya', 'Dolores Hidalgo', 'San Miguel de Allende', 'Silao', 'Valle de Santiago'],
+  Guerrero: ['Chilpancingo', 'Acapulco', 'Iguala', 'Taxco', 'Zihuatanejo', 'Chilapa', 'Tlapa', 'Ometepec'],
+  Hidalgo: ['Pachuca', 'Tulancingo', 'Tula', 'Ixmiquilpan', 'Huejutla', 'Actopan', 'Tepeji del Río', 'Apan', 'Tizayuca'],
+  Jalisco: ['Guadalajara', 'Zapopan', 'Tlaquepaque', 'Tonalá', 'Puerto Vallarta', 'Tepatitlán', 'El Salto', 'Lagos de Moreno', 'Ocotlán'],
+  México: ['Toluca', 'Naucalpan', 'Tlalnepantla', 'Ecatepec', 'Nezahualcóyotl', 'Tlalnepantla', 'Cuautitlán Izcalli', 'Chimalhuacán', 'Naucalpan'],
+  Michoacán: ['Morelia', 'Uruapan', 'Lázaro Cárdenas', 'Zamora', 'Pátzcuaro', 'Apatzingán', 'Zitácuaro', 'Sahuayo', 'La Piedad'],
+  Morelos: ['Cuernavaca', 'Cuautla', 'Jiutepec', 'Temixco', 'Yautepec', 'Xochitepec', 'Tepoztlán', 'Puente de Ixtla', 'Emiliano Zapata'],
+  Nayarit: ['Tepic', 'Bahía de Banderas', 'Santiago Ixcuintla', 'Compostela', 'Acaponeta', 'Tecuala', 'Ixtlán del Río', 'San Blas', 'Rosamorada'],
+  NuevoLeón: ['Monterrey', 'Guadalupe', 'San Nicolás de los Garza', 'Escobedo', 'Santa Catarina', 'San Pedro Garza García', 'Apodaca', 'Juárez', 'General Escobedo'],
+  Oaxaca: ['Oaxaca', 'Salina Cruz', 'Juchitán de Zaragoza', 'Huajuapan de León', 'Tuxtepec', 'San Juan Bautista Tuxtepec', 'Miahuatlán de Porfirio Díaz', 'Santiago Pinotepa Nacional', 'Santo Domingo Tehuantepec'],
+  Puebla: ['Puebla', 'Tehuacán', 'San Andrés Cholula', 'Cholula', 'Atlixco', 'Izúcar de Matamoros', 'Teziutlán', 'Huauchinango', 'Acatlán de Osorio'],
+  Querétaro: ['Querétaro', 'San Juan del Río', 'Corregidora', 'El Marqués', 'Jalpan de Serra', 'Pedro Escobedo', 'Amealco de Bonfil', 'Ezequiel Montes', 'Huimilpan'],
+  QuintanaRoo: ['Cancún', 'Playa del Carmen', 'Chetumal', 'Cozumel', 'Isla Mujeres', 'Tulum', 'Bacalar', 'Felipe Carrillo Puerto', 'José María Morelos'],
+  SanLuisPotosí: ['San Luis Potosí', 'Soledad de Graciano Sánchez', 'Matehuala', 'Ciudad Valles', 'Rioverde', 'Tamazunchale', 'Ébano', 'Cárdenas', 'Salinas de Hidalgo'],
+  Sinaloa: ['Culiacán', 'Mazatlán', 'Los Mochis', 'Guasave', 'Mochis', 'El Fuerte', 'Navolato', 'Escuinapa', 'Salvador Alvarado'],
+  Sonora: ['Hermosillo', 'Ciudad Obregón', 'Nogales', 'San Luis Río Colorado', 'Guaymas', 'Empalme', 'Navojoa', 'Caborca', 'Puerto Peñasco'],
+  Tabasco: ['Villahermosa', 'Cárdenas', 'Comalcalco', 'Tenosique', 'Macuspana', 'Centro', 'Jalpa de Méndez', 'Paraíso', 'Balancán'],
+  Tamaulipas: ['Reynosa', 'Matamoros', 'Nuevo Laredo', 'Tampico', 'Ciudad Victoria', 'Ciudad Madero', 'Altamira', 'Mante', 'Valle Hermoso'],
+  Tlaxcala: ['Tlaxcala', 'Apizaco', 'Zacatelco', 'Huamantla', 'Chiautempan', 'Tlaxco', 'Santa Ana Chiautempan', 'Contla de Juan Cuamatzi', 'Panotla'],
+  Veracruz: ['Veracruz', 'Xalapa', 'Coatzacoalcos', 'Minatitlán', 'Poza Rica', 'Córdoba', 'Papantla', 'Tuxpan', 'Cosoleacaque'],
+  Yucatán: ['Mérida', 'Kanasín', 'Progreso', 'Tizimín', 'Umán', 'Valladolid', 'Tekax', 'Izamal', 'Motul'],
+  Zacatecas: ['Zacatecas', 'Fresnillo', 'Jerez', 'Rio Grande', 'Guadalupe', 'Sombrerete', 'Loreto', 'Valparaíso', 'Villa de Cos'],
+};
+
+export default estadosMunicipios;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 17:42:05 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

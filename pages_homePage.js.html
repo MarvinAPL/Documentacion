@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/homePage.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/homePage.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect, useState } from 'react'; // Importa React y hooks
+import { useNavigate } from 'react-router-dom'; // Importa el hook para navegación
+import { Navbar } from '../components/navbar1'; // Importa el componente Navbar
+import { Footer } from '../components/Footer'; // Importa el componente Footer
+import { CardInfHome } from '../components/cardInfHome'; // Importa el componente CardInfHome
+import Slider from 'react-slick'; // Importa el componente Slider para el carrusel
+import styles from '../assets/styles/home.module.css'; // Importa los estilos para el componente
+import 'slick-carousel/slick/slick.css'; // Importa los estilos para slick-carousel
+import 'slick-carousel/slick/slick-theme.css'; // Importa los estilos de tema para slick-carousel
+import { InfoExtra } from '../components/InfoExtra'; // Importa el componente InfoExtra
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'; // Importa funciones de Firestore
+import { db } from '../firebase/config'; // Importa la configuración de Firebase
+import { Toolbar } from '../components/Toolbar'; // Importa el componente Toolbar
+import { useTranslation } from 'react-i18next'; // Importa el hook para traducción
+
+/**
+ * Componente Home - Página principal que muestra un carrusel de proyectos y noticias, información adicional y un mapa.
+ * 
+ * @returns {JSX.Element} - Retorna el JSX para mostrar la página principal.
+ */
+export function Home() {
+  const { t } = useTranslation('Home'); // Hook para traducción
+  const navigate = useNavigate(); // Hook para la navegación
+  const [projects, setProjects] = useState([]); // Estado para almacenar proyectos
+  const [news, setNews] = useState([]); // Estado para almacenar noticias
+
+  /**
+   * Navega a la página de contacto.
+   */
+  const goToContact = () => {
+    navigate('/Contact');
+  };
+
+  /**
+   * Navega a la página de proyectos.
+   */
+  const goToProjects = () => {
+    navigate('/Projects');
+  };
+
+  /**
+   * Fetches projects and news data from Firebase and updates the state.
+   */
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const projectsQuery = query(collection(db, 'Projects'), orderBy('createdAt', 'desc'), limit(5));
+        const projectsSnapshot = await getDocs(projectsQuery);
+        const projectsData = projectsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setProjects(projectsData);
+
+        const newsQuery = query(collection(db, 'News'), orderBy('createdAt', 'desc'), limit(5));
+        const newsSnapshot = await getDocs(newsQuery);
+        const newsData = newsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setNews(newsData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []); // Ejecuta el efecto solo una vez al montar el componente
+
+  // Configuración del carrusel
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: projects.length > 1 ? 2 : 1, // Muestra dos proyectos si hay más de uno, de lo contrario muestra uno
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 1280,
+        settings: {
+          slidesToShow: 1, // Muestra uno si hay un solo proyecto, de lo contrario muestra dos
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 1, // Muestra uno si hay un solo proyecto, de lo contrario muestra dos
+          slidesToScroll: 1,
+          infinite: true,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1, // Solo muestra una tarjeta
+          slidesToScroll: 1,
+          centerMode: true, // Para centrar la tarjeta actual
+          centerPadding: '5px' // Ajusta el espacio alrededor de la tarjeta actual
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1, // Solo muestra una tarjeta
+          slidesToScroll: 1
+        }
+      }
+    ]
+  };
+
+  return (
+    &lt;div>
+      &lt;div className={styles.headerContainer}>
+        &lt;div className={styles.containerIdioma}>
+          &lt;div className={styles.containerIdioma1}>
+            &lt;Toolbar />
+          &lt;/div>
+        &lt;/div>
+        &lt;div className={styles.navBa}>
+          &lt;Navbar />
+        &lt;/div>
+        
+        &lt;div className={styles.overlay}>&lt;/div>
+        &lt;div className={styles.headerContent}>
+          &lt;h1>{t('headerTitle')}&lt;/h1>
+          &lt;h2>{t('headerSubtitle')}&lt;/h2>
+        &lt;/div>
+      &lt;/div>
+
+      &lt;div className={styles.headerButtons}>
+        &lt;h3>{t('headerButtonsTitle')}&lt;/h3>
+        &lt;p>{t('headerButtonsSubtitle')}&lt;/p>
+        &lt;div className={styles.buttons}>
+          &lt;button className={styles.contactButton} onClick={goToContact}>{t('contactUs')}&lt;/button>
+          &lt;button className={styles.projectsButton} onClick={goToProjects}>{t('viewProjects')}&lt;/button>
+        &lt;/div>
+      &lt;/div>
+      
+      &lt;div className={styles.aboutSection}>
+        &lt;div className={styles.aboutContent}>
+          &lt;h2>{t('aboutUs')}&lt;/h2>
+          &lt;p>{t('aboutUsDescription')}&lt;/p>
+        &lt;/div>
+        &lt;div className={styles.aboutImage}>
+          &lt;img src="sk1.jpg" alt="Imagen de la empresa" />
+        &lt;/div>
+      &lt;/div>
+
+      &lt;div className={styles.logosSection}>
+        &lt;h2>{t('newsTitle')}&lt;/h2>
+      &lt;/div>
+
+      &lt;div className={styles.carouselSection}>
+        {projects.length > 0 &amp;&amp; (
+          &lt;Slider {...settings}>
+            {projects.map((project, index) => (
+              &lt;div key={index} className={styles.projectsWrapper}>
+                &lt;CardInfHome
+                  title={project.title}
+                  subtitle={project.subtitle}
+                  description={project.description}
+                  image={project.image}
+                />
+              &lt;/div>
+            ))}
+          &lt;/Slider>
+        )}
+      &lt;/div>
+
+      &lt;div className={styles.sectionHeader}>
+        &lt;h2>{t('directionsTitle')}&lt;/h2>
+      &lt;/div>
+
+      &lt;div className={styles.mapSection}>
+        &lt;iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7489.48792708038!2d-100.14998111083092!3d20.186383300000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d31b0593130dc7%3A0x355ffeca0b223b4b!2sAMEALCO%20CENTRO!5e0!3m2!1ses-419!2smx!4v1721184875576!5m2!1ses-419!2smx"
+          width="1220"
+          height="450"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Ubicación de Sheksa Construcciones">
+        &lt;/iframe>
+      &lt;/div>
+
+      &lt;div className={styles.sectionHeader}>
+        &lt;h2>{t('newsHeader')}&lt;/h2>
+      &lt;/div>
+
+      &lt;div className={styles.cardsHome}>
+        {news.map((newsItem, index) => (
+          &lt;InfoExtra
+            key={index}
+            title={newsItem.title}
+            subtitle={newsItem.subtitle}
+            description={newsItem.description}
+            image={newsItem.image}
+          />
+        ))}
+      &lt;/div>
+
+      &lt;Footer />
+    &lt;/div>
+  );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

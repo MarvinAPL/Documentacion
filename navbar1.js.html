@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: navbar1.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: navbar1.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from './statusUser';
+import { auth, db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
+import styles from '../assets/styles/navbar1.module.css';
+
+/**
+ * Navbar component that provides navigation links and user profile options.
+ * It handles menu toggle, fetching profile images, and managing user authentication state.
+ * @component
+ * @example
+ * return (
+ *   &lt;Navbar />
+ * );
+ */
+export function Navbar() {
+    const { t } = useTranslation('navbar');
+    const { i18n } = useTranslation();
+    const currentLanguage = i18n.language;
+    const [isOpen, setIsOpen] = useState(false);
+    const { isLoggedIn, handleSignOut } = useAuth();
+    const [profileImage, setProfileImage] = useState('');
+    const [showProfileOptions, setShowProfileOptions] = useState(false);
+    const profileMenuRef = useRef(null);
+    const navRef = useRef(null);
+    const [logoError, setLogoError] = useState(false);
+
+    /**
+     * Toggles the state of the mobile menu.
+     */
+    const toggleMenu = () => {
+        setIsOpen(prevState => !prevState);
+    };
+
+    /**
+     * Closes the mobile menu.
+     */
+    const closeMenu = () => {
+        setIsOpen(false);
+    };
+
+    /**
+     * Fetches and sets the profile image for a given user ID from Firestore.
+     * @param {string} userId - The user ID to fetch the profile image for.
+     */
+    const fetchProfileImage = async (userId) => {
+        try {
+            const docRef = doc(db, "Users", userId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                setProfileImage(docSnap.data().photo);
+            } else {
+                console.log("No such document!");
+            }
+        } catch (error) {
+            console.error("Error fetching profile image:", error);
+        }
+    };
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            if (user) {
+                fetchProfileImage(user.uid);
+            } else {
+                setProfileImage('');
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = event => {
+            if (
+                (profileMenuRef.current &amp;&amp; !profileMenuRef.current.contains(event.target)) ||
+                (navRef.current &amp;&amp; !navRef.current.contains(event.target))
+            ) {
+                setShowProfileOptions(false);
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    /**
+     * Toggles the visibility of the profile options menu.
+     */
+    const toggleProfileOptions = () => {
+        setShowProfileOptions(prevState => !prevState);
+    };
+
+    return (
+        &lt;nav className={styles.nav} ref={navRef}>
+            &lt;div className={styles.container}>
+                {/* Logo Section */}
+                &lt;div className={styles.logo}>
+                    &lt;Link to="/" onClick={closeMenu}>
+                        &lt;img 
+                            src='/LOGO-SHEKSA1.png' 
+                            alt={t('navbar.logoAlt')} 
+                            onError={() => setLogoError(true)} 
+                        />
+                        {logoError &amp;&amp; &lt;p style={{ color: 'red' }}>{t('navbar.logoError')}&lt;/p>}
+                    &lt;/Link>
+                &lt;/div>
+
+                &lt;button className={styles.hamburger} onClick={toggleMenu}>
+                    ☰
+                &lt;/button>
+
+                {/* Menu Section */}
+                &lt;div className={styles.menu}>
+                    &lt;ul className={`${styles.ul} ${isOpen ? styles.open : ''}`}>
+                        &lt;li>
+                            &lt;Link to="/about" onClick={closeMenu}>{t('navbar.about')}&lt;/Link>
+                        &lt;/li>
+                        &lt;li>
+                            &lt;Link to="/projects" onClick={closeMenu}>{t('navbar.projects')}&lt;/Link>
+                        &lt;/li>
+                        &lt;li>
+                            &lt;Link to="/contact" onClick={closeMenu}>{t('navbar.contact')}&lt;/Link>
+                        &lt;/li>
+                        &lt;li>
+                            &lt;Link to="/news" onClick={closeMenu}>{t('navbar.news')}&lt;/Link>
+                        &lt;/li>
+                        &lt;li className={`${styles.affiliate} ${currentLanguage === 'es' ? styles.affiliateEs : styles.affiliateEn}`}>
+                            &lt;Link to="/AffiliateAgencies" onClick={closeMenu}>{t('navbar.affiliate')}&lt;/Link>
+                        &lt;/li>
+
+                        {!isLoggedIn ? (
+                            &lt;>
+                                &lt;li className={styles.ocu}>
+                                    &lt;Link to="/login" className={styles.login} onClick={closeMenu}>{t('navbar.login')}&lt;/Link>
+                                &lt;/li>
+                                &lt;li className={styles.ocu}>
+                                    &lt;Link to="/Publicate" className={styles.joinNow} onClick={closeMenu}>{t('navbar.joinNow')}&lt;/Link>
+                                &lt;/li>
+                            &lt;/>
+                        ) : (
+                            &lt;>
+                                &lt;li className={styles.ocu}>
+                                    &lt;Link to="/profile" className={styles.login} onClick={closeMenu}>{t('navbar.profile')}&lt;/Link>
+                                &lt;/li>
+                                &lt;li className={styles.ocu}>
+                                    &lt;Link to="/Publicate" className={styles.joinNow} onClick={closeMenu}>{t('navbar.joinNow')}&lt;/Link>
+                                &lt;/li>
+                                &lt;li className={styles.ocu}>
+                                    &lt;button onClick={() => { handleSignOut(); closeMenu(); }} className={`${styles.gogo} ${styles.buttonU}`}>{t('navbar.signOut')}&lt;/button>
+                                &lt;/li>
+                            &lt;/>
+                        )}
+                    &lt;/ul>
+                &lt;/div>
+
+                {/* Profile/Login/JoinNow Section */}
+                &lt;div className={styles.auth}>
+                    {isLoggedIn ? (
+                        &lt;div className={styles.profileMenu} ref={profileMenuRef}>
+                            &lt;img 
+                                src={profileImage || 'about.jpg'} 
+                                alt={t('navbar.profileAlt')} 
+                                className={styles.profileImage} 
+                                onClick={toggleProfileOptions}
+                            />
+                            {showProfileOptions &amp;&amp; (
+                                &lt;div className={styles.profileOptions}>
+                                    &lt;Link to="/profile" className={`${styles.gogo} ${styles['logged-in']}`} onClick={closeMenu}>{t('navbar.profile')}&lt;/Link>
+                                    &lt;Link to="/Publicate" className={`${styles.gogo} ${styles['logged-in']}`} onClick={closeMenu}>{t('navbar.joinNow')}&lt;/Link>
+                                    &lt;button onClick={() => { handleSignOut(); closeMenu(); }} className={`${styles.gogo} ${styles.buttonU}`}>{t('navbar.signOut')}&lt;/button>
+                                &lt;/div>
+                            )}
+                        &lt;/div>
+                    ) : (
+                        &lt;>
+                            &lt;Link to="/login" className={styles.login} onClick={closeMenu}>{t('navbar.login')}&lt;/Link>
+                            &lt;Link to="/Publicate" className={styles.joinNow} onClick={closeMenu}>{t('navbar.joinNow')}&lt;/Link>
+                        &lt;/>
+                    )}
+                &lt;/div>
+            &lt;/div>
+        &lt;/nav>
+    );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 17:42:05 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

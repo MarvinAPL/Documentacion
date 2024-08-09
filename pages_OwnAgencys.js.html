@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/OwnAgencys.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/OwnAgencys.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect, useState } from 'react';
+import styles from '../assets/styles/Affiliate.module.css';
+import { useAuth } from '../components/statusUser';
+import { useNavigate } from 'react-router-dom';
+import { db } from '../firebase/config';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+
+/**
+ * Componente que muestra las agencias propiedad del usuario actualmente autenticado.
+ * Permite al usuario agregar nuevas agencias y ver las agencias existentes.
+ *
+ * @component
+ * @example
+ * return (
+ *   &lt;OwnAgencys />
+ * )
+ */
+export function OwnAgencys() {
+    const { isLoggedIn, user } = useAuth();
+    const navigate = useNavigate();
+    const [agencies, setAgencies] = useState([]);
+
+    useEffect(() => {
+        /**
+         * Función asíncrona que recupera las agencias propiedad del usuario autenticado.
+         * Utiliza Firestore para realizar una consulta a la colección 'Agencias' y filtrar por el ID del usuario.
+         */
+        const fetchAgencies = async () => {
+            try {
+                if (!user) return; // Si no hay usuario logeado, no se hace la consulta
+
+                // Consultar las agencias donde userId sea igual al ID del usuario actual
+                const q = query(collection(db, 'Agencias'), where('userId', '==', user.uid));
+                const querySnapshot = await getDocs(q);
+
+                const agenciesData = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setAgencies(agenciesData);
+            } catch (error) {
+                console.error('Error fetching agencies:', error);
+            }
+        };
+
+        fetchAgencies();
+    }, [user]); // Dependencia para que se vuelva a consultar cuando cambia el usuario
+
+    /**
+     * Maneja el clic en el botón "Agregar", redirigiendo al usuario a la página para añadir una nueva agencia.
+     */
+    const handleAddButtonClick = () => {
+        navigate('/NewAgency');
+    };
+
+    return (
+        &lt;div>
+            &lt;div className={styles.btn}>
+                {isLoggedIn &amp;&amp; (
+                    &lt;button className={styles.addButton} onClick={handleAddButtonClick}>
+                        Agregar
+                    &lt;/button>
+                )}
+            &lt;/div>
+
+            &lt;div className={styles.listings}>
+                {agencies.map((agency, index) => (
+                    &lt;div key={index} className={styles.listing}>
+                        &lt;img src={agency.imagen} alt={agency.propiedad} />
+                        &lt;h3>Propiedad: {agency.propiedad}&lt;/h3>
+                        &lt;p>Costo: {agency.costo}&lt;/p>
+                        &lt;p>Ciudad: {agency.ciudad}&lt;/p>
+                        &lt;a href={`/Agencia/${agency.id}`}>Ver Detalles&lt;/a>
+                    &lt;/div>
+                ))}
+            &lt;/div>
+        &lt;/div>
+    );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

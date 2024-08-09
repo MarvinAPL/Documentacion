@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Card.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Card.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Componente de tarjeta que muestra la información de un documento y permite editarlo o eliminarlo.
+ * 
+ * @param {Object} props - Propiedades del componente.
+ * @param {string} props.id - ID del documento.
+ * @param {string} props.collectionName - Nombre de la colección en Firebase.
+ * @param {string} props.image - URL de la imagen principal.
+ * @param {string} props.title - Título del documento.
+ * @param {string} props.description - Descripción del documento.
+ * @param {string} props.price - Precio del documento.
+ * @param {string} props.city - Ciudad del documento.
+ * @param {string} props.state - Estado del documento.
+ * @param {string} props.direction - Dirección del documento.
+ * @param {string} props.category - Categoría del documento.
+ * @param {Object} props.displayFields - Campos a mostrar en la tarjeta.
+ * @param {string} props.userId - ID del usuario propietario del documento.
+ * @param {string[]} [props.additionalImages=[]] - Imágenes adicionales asociadas al documento.
+ * 
+ * @returns {JSX.Element} - Componente de la tarjeta con funcionalidad de edición y eliminación.
+ */
+const Card = ({
+  id,
+  collectionName,
+  image,
+  title,
+  description,
+  price,
+  city,
+  state,
+  direction,
+  category,
+  displayFields,
+  userId,
+  additionalImages = []
+}) => {
+  // Hook de autenticación
+  const { user, isAdmin } = useAuth(); // Usar el hook useAuth para obtener isAdmin
+
+  // Campos permitidos por colección
+  const allowedFields = {
+    News: ['title', 'description', 'image'],
+    Projects: ['image', 'additionalImages', 'title', 'category','price', 'description'],
+    Agencies: ['title','image', 'price', 'city','state', 'additionalImages']
+  };
+
+  // Estado local del formulario
+  const [formData, setFormData] = useState({
+    image: image || null,
+    title: title || '',
+    description: description || '',
+    price: price || '',
+    city: city || '',
+    state: state || '',
+    direction: direction || '',
+    category: category || '',
+    additionalImages: additionalImages || [],
+  });
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [newAdditionalImages, setNewAdditionalImages] = useState([]);
+  const [userName, setUserName] = useState('');
+  const [municipios, setMunicipios] = useState([]);
+
+  /**
+   * Efecto para actualizar la lista de municipios cuando cambia el estado.
+   */
+  useEffect(() => {
+    if (formData.state) {
+      setMunicipios(estadosMunicipios[formData.state] || []);
+    } else {
+      setMunicipios([]);
+    }
+  }, [formData.state]);
+
+  /**
+   * Efecto para obtener el nombre del usuario basado en userId.
+   */
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const userDocRef = doc(db, 'Users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          setUserName(userDocSnap.data().Name);
+        } else {
+          console.error('Usuario no encontrado');
+        }
+      } catch (error) {
+        console.error('Error al obtener el nombre del usuario: ', error);
+      }
+    };
+
+    fetchUserName();
+  }, [userId]);
+
+  // Manejar cambios en los campos del formulario
+  const handleChange = (e) => {
+    if (e.target.name === 'additionalImages') {
+      setNewAdditionalImages([...newAdditionalImages, ...Array.from(e.target.files)]);
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.files ? e.target.files[0] : e.target.value,
+      });
+    }
+  };
+
+  /**
+   * Actualiza el documento en Firestore.
+   */
+  const handleUpdate = async () => {
+    try {
+      const docRef = doc(db, collectionName, id);
+
+      let updatedData = {};
+
+      // Manejar imagen principal
+      if (formData.image instanceof File) {
+        if (image) {
+          const imageRef = ref(storage, image);
+          await deleteObject(imageRef);
+        }
+
+        const storageRef = ref(storage, `${collectionName}/${formData.image.name}`);
+        await uploadBytes(storageRef, formData.image);
+        const downloadURL = await getDownloadURL(storageRef);
+        updatedData.image = downloadURL;
+      }
+
+      // Manejar imágenes adicionales
+      const additionalImagesUrls = [...formData.additionalImages];
+      for (const file of newAdditionalImages) {
+        const storageRef = ref(storage, `${collectionName}/additional/${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        additionalImagesUrls.push(url);
+      }
+      updatedData.additionalImages = additionalImagesUrls;
+
+      // Actualizar campos permitidos
+      const fields = allowedFields[collectionName];
+      fields.forEach((field) => {
+        if (formData[field] !== undefined) {
+          switch (field) {
+            case 'title':
+              if (formData.title !== title) updatedData.title = formData.title;
+              break;
+            case 'description':
+              if (formData.description !== description) updatedData.description = formData.description;
+              break;
+            case 'price':
+              if (formData.price !== price) updatedData.price = formData.price;
+              break;
+            case 'city':
+              if (formData.city !== city) updatedData.city = formData.city;
+              break;
+            case 'state':
+              if (formData.state !== state) updatedData.state = formData.state;
+              break;
+            case 'direction':
+              if (formData.direction !== direction) updatedData.direction = formData.direction;
+              break;
+            case 'category':
+              if (formData.category !== category) updatedData.category = formData.category;
+              break;
+            default:
+              break;
+          }
+        }
+      });
+
+      if (Object.keys(updatedData).length > 0) {
+        await updateDoc(docRef, updatedData);
+      }
+
+      closeModal();
+      window.location.reload();
+    } catch (error) {
+      console.error('Error al actualizar el documento: ', error);
+    }
+  };
+
+  /**
+   * Elimina el documento y sus imágenes asociadas.
+   */
+  const handleDelete = async () => {
+    try {
+      // Eliminar imagen principal
+      if (image) {
+        const imageRef = ref(storage, image);
+        await deleteObject(imageRef);
+      }
+
+      // Eliminar imágenes adicionales
+      for (const imgUrl of formData.additionalImages) {
+        const imgRef = ref(storage, imgUrl);
+        await deleteObject(imgRef);
+      }
+
+      const docRef = doc(db, collectionName, id);
+      await deleteDoc(docRef);
+
+      closeConfirmDelete();
+      window.location.reload();
+    } catch (error) {
+      console.error('Error al eliminar el documento: ', error);
+    }
+  };
+
+  /**
+   * Elimina una imagen adicional.
+   * 
+   * @param {number} index - Índice de la imagen a eliminar.
+   */
+  const handleRemoveAdditionalImage = async (index) => {
+    try {
+      const imageUrl = formData.additionalImages[index];
+      const imgRef = ref(storage, imageUrl);
+      await deleteObject(imgRef);
+
+      const updatedAdditionalImages = [...formData.additionalImages];
+      updatedAdditionalImages.splice(index, 1);
+
+      setFormData({ ...formData, additionalImages: updatedAdditionalImages });
+
+      const docRef = doc(db, collectionName, id);
+      await updateDoc(docRef, { additionalImages: updatedAdditionalImages });
+
+    } catch (error) {
+      console.error('Error al eliminar la imagen adicional: ', error);
+    }
+  };
+
+  const openModal = () => {
+    setModalIsOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+    document.body.style.overflow = 'auto';
+  };
+
+  const openConfirmDelete = () => {
+    setConfirmDelete(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeConfirmDelete = () => {
+    setConfirmDelete(false);
+    document.body.style.overflow = 'auto';
+  };
+
+  const editOrDelete = user &amp;&amp; (user.uid === userId || isAdmin);
+
+  return (
+    &lt;div key={id}>
+      &lt;div className={styles.card}>
+        {displayFields.image &amp;&amp; &lt;img className={styles.fixedSizeImage} src={image} alt={title} />}
+        {displayFields.title &amp;&amp; &lt;h3>{title}&lt;/h3>}
+        &lt;div className={styles.containerBot}>
+          {displayFields.description &amp;&amp; &lt;p>{description}&lt;/p>}
+          {displayFields.city &amp;&amp; &lt;p>{city}&lt;/p>}
+          {displayFields.state &amp;&amp; &lt;p>{state}&lt;/p>}
+          {displayFields.direction &amp;&amp; &lt;p>{direction}&lt;/p>}
+          {displayFields.category &amp;&amp; &lt;p>{category}&lt;/p>}
+          {displayFields.price &amp;&amp; &lt;p>{price}&lt;/p>}
+          {displayFields.userName &amp;&amp; (
+            &lt;p>
+              &lt;Link to={`/UserProfile/${userId}`}>{userName}&lt;/Link>
+            &lt;/p>
+          )}
+          &lt;Link to={`/${collectionName}/${id}`} className={styles.link}>
+            Ver más
+          &lt;/Link>
+          {editOrDelete &amp;&amp; (
+            &lt;>
+              &lt;button onClick={openModal}>Editar&lt;/button>
+              &lt;button onClick={openConfirmDelete}>Eliminar&lt;/button>
+            &lt;/>
+          )}
+        &lt;/div>
+      &lt;/div>
+
+      {/* Modal para editar */}
+      {modalIsOpen &amp;&amp; (
+        &lt;div className={styles.modalOverlay}>
+          &lt;div className={styles.modal}>
+            &lt;button onClick={closeModal} className={styles.closeButton}>
+              &amp;times;
+            &lt;/button>
+            &lt;h2>Editar {title}&lt;/h2>
+            &lt;form className={styles.formContainer}>
+              {displayFields.image &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="image">Imagen principal:&lt;/label>
+                  &lt;input type="file" name="image" onChange={handleChange} />
+                &lt;/div>
+              )}
+              {displayFields.additionalImages &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="additionalImages">Imágenes adicionales:&lt;/label>
+                  &lt;input type="file" name="additionalImages" onChange={handleChange} multiple />
+                  &lt;div className={styles.imageList}>
+                    {formData.additionalImages.map((img, index) => (
+                      &lt;div key={index} className={styles.imageItem}>
+                        &lt;img src={img} alt={`Adicional ${index + 1}`} />
+                        &lt;button onClick={() => handleRemoveAdditionalImage(index)}>
+                          Eliminar
+                        &lt;/button>
+                      &lt;/div>
+                    ))}
+                  &lt;/div>
+                &lt;/div>
+              )}
+              {displayFields.title &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="title">Título:&lt;/label>
+                  &lt;input type="text" name="title" value={formData.title} onChange={handleChange} />
+                &lt;/div>
+              )}
+              {displayFields.description &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="description">Descripción:&lt;/label>
+                  &lt;textarea name="description" value={formData.description} onChange={handleChange}>&lt;/textarea>
+                &lt;/div>
+              )}
+              {displayFields.price &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="price">Precio:&lt;/label>
+                  &lt;input type="text" name="price" value={formData.price} onChange={handleChange} />
+                &lt;/div>
+              )}
+              {displayFields.city &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="city">Ciudad:&lt;/label>
+                  &lt;input type="text" name="city" value={formData.city} onChange={handleChange} />
+                &lt;/div>
+              )}
+              {displayFields.state &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="state">Estado:&lt;/label>
+                  &lt;select name="state" value={formData.state} onChange={handleChange}>
+                    &lt;option value="">Seleccione un estado&lt;/option>
+                    {Object.keys(estadosMunicipios).map((estado) => (
+                      &lt;option key={estado} value={estado}>
+                        {estado}
+                      &lt;/option>
+                    ))}
+                  &lt;/select>
+                &lt;/div>
+              )}
+              {displayFields.direction &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="direction">Dirección:&lt;/label>
+                  &lt;input type="text" name="direction" value={formData.direction} onChange={handleChange} />
+                &lt;/div>
+              )}
+              {displayFields.category &amp;&amp; (
+                &lt;div>
+                  &lt;label htmlFor="category">Categoría:&lt;/label>
+                  &lt;input type="text" name="category" value={formData.category} onChange={handleChange} />
+                &lt;/div>
+              )}
+            &lt;/form>
+            &lt;button onClick={handleUpdate}>Guardar cambios&lt;/button>
+          &lt;/div>
+        &lt;/div>
+      )}
+
+      {/* Modal de confirmación para eliminar */}
+      {confirmDelete &amp;&amp; (
+        &lt;div className={styles.modalOverlay}>
+          &lt;div className={styles.modal}>
+            &lt;h2>¿Seguro que quieres eliminar {title}?&lt;/h2>
+            &lt;button onClick={handleDelete}>Sí, eliminar&lt;/button>
+            &lt;button onClick={closeConfirmDelete}>Cancelar&lt;/button>
+          &lt;/div>
+        &lt;/div>
+      )}
+    &lt;/div>
+  );
+};
+
+export default Card;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

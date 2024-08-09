@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/statusUser.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/statusUser.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useState, useEffect } from 'react';
+import { auth, db } from '../firebase/config';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+
+/**
+ * Hook para manejar el estado de autenticación del usuario.
+ * 
+ * Este hook proporciona información sobre si el usuario está autenticado,
+ * si el usuario es un administrador y el objeto del usuario. También proporciona
+ * una función para cerrar sesión.
+ * 
+ * @returns {Object} - Un objeto con las propiedades y funciones relacionadas con la autenticación.
+ * @returns {boolean} isLoggedIn - Indica si el usuario está autenticado.
+ * @returns {boolean} isAdmin - Indica si el usuario es un administrador.
+ * @returns {Object|null} user - El objeto del usuario autenticado o null si no hay usuario.
+ * @returns {Function} handleSignOut - Función para cerrar sesión.
+ */
+export const useAuth = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [user, setUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        // Configura un observador para los cambios en el estado de autenticación
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                setIsLoggedIn(true);
+                setUser(currentUser);
+
+                // Obtener el documento del usuario desde Firestore
+                const userDoc = await getDoc(doc(db, "Users", currentUser.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    setIsAdmin(userData.isAdmin); // Establece si el usuario es un administrador
+                }
+                
+            } else {
+                setIsLoggedIn(false);
+                setUser(null);
+                setIsAdmin(false);
+            }
+        });
+        
+        // Limpia el observador cuando el componente se desmonte
+        return () => unsubscribe();
+    }, []);
+
+    /**
+     * Cierra sesión del usuario actual y redirige a la página de inicio.
+     */
+    const handleSignOut = () => {
+        signOut(auth).then(() => {
+            window.location.href = "/";
+            // Cierre de sesión exitoso.
+        }).catch((error) => {
+            console.error("Error signing out: ", error);
+        });
+    };
+
+    return { isLoggedIn, isAdmin, user, handleSignOut };
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

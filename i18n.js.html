@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: i18n.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: i18n.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+// IMPORTS INGLES
+import HomeEN from '../src/locales/en/Home.json';
+import AboutEN from '../src/locales/en/About.json';
+import afiliateEN from '../src/locales/en/afiliate.json';
+import ContactEN from '../src/locales/en/Contact.json';
+import filteringEN from '../src/locales/en/filtering.json';
+import LoginEN from '../src/locales/en/Login.json';
+import navbarEN from '../src/locales/en/navbar.json';
+import ProfilesEN from '../src/locales/en/Profiles.json';
+import ProjectsEN from '../src/locales/en/Projects.json';
+import PublicateEN from '../src/locales/en/Publicate.json';
+import RegisterEN from '../src/locales/en/Register.json';
+import FooterEN from '../src/locales/en/footer.json';
+import NewsEN from '../src/locales/en/news.json';
+
+// IMPORTS ESPAÑOL
+import HomeES from '../src/locales/es/Home.json';
+import AboutES from '../src/locales/es/About.json';
+import afiliateES from '../src/locales/es/afiliate.json';
+import ContactES from '../src/locales/es/Contact.json';
+import filteringES from '../src/locales/es/filtering.json';
+import LoginES from '../src/locales/es/Login.json';
+import navbarES from '../src/locales/es/navbar.json';
+import ProfilesES from '../src/locales/es/Profiles.json';
+import ProjectsES from '../src/locales/es/Projects.json';
+import PublicateES from '../src/locales/es/Publicate.json';
+import RegisterES from '../src/locales/es/Register.json';
+import FooterES from '../src/locales/es/footer.json';
+import NewsES from '../src/locales/es/news.json';
+
+/**
+ * Recursos de traducción disponibles en la aplicación.
+ * 
+ * @constant
+ * @type {Object}
+ * @property {Object} en - Recursos de traducción en inglés.
+ * @property {Object} es - Recursos de traducción en español.
+ * @property {Object} en.Home - Traducciones para la página de inicio en inglés.
+ * @property {Object} en.About - Traducciones para la página de sobre nosotros en inglés.
+ * @property {Object} es.Home - Traducciones para la página de inicio en español.
+ * @property {Object} es.About - Traducciones para la página de sobre nosotros en español.
+ */
+const resources = {
+  en: {
+    Home: HomeEN,
+    About: AboutEN,
+    afiliate: afiliateEN,
+    Contact: ContactEN,
+    filtering: filteringEN,
+    Login: LoginEN,
+    navbar: navbarEN,
+    Profiles: ProfilesEN,
+    Projects: ProjectsEN,
+    Publicate: PublicateEN,
+    Register: RegisterEN,
+    footer: FooterEN,
+    news: NewsEN
+  },
+  es: { 
+    Home: HomeES,
+    About: AboutES,
+    afiliate: afiliateES,
+    Contact: ContactES,
+    filtering: filteringES,
+    Login: LoginES,
+    navbar: navbarES,
+    Profiles: ProfilesES,
+    Projects: ProjectsES,
+    Publicate: PublicateES,
+    Register: RegisterES,
+    footer: FooterES,
+    news: NewsES
+  },
+};
+
+/**
+ * Configura e inicializa i18next para la aplicación.
+ * 
+ * Usa el módulo `react-i18next` para la integración con React.
+ * 
+ * @function
+ * @returns {void}
+ */
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: 'es', // Idioma por defecto a español
+    fallbackLng: 'es', // Idioma de reserva
+    interpolation: {
+      escapeValue: false, // React ya hace el escape de valores por defecto
+    },
+  });
+
+export default i18n;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

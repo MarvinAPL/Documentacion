@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/Contact.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/Contact.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useRef } from 'react'; // Importa React y el hook useRef
+import emailjs from 'emailjs-com'; // Importa la librería para enviar correos
+import styles from '../assets/styles/Contact.module.css'; // Importa los estilos específicos para la página Contact
+import { Navbar } from '../components/navbar1'; // Importa el componente Navbar
+import { Footer } from '../components/Footer'; // Importa el componente Footer
+import { useTranslation } from 'react-i18next'; // Importa el hook para la traducción de textos
+
+/**
+ * Componente Contact - Página de contacto
+ * 
+ * Este componente representa la página "Contact" que permite a los usuarios enviar un mensaje
+ * a través de un formulario. Incluye una barra de navegación, un formulario para enviar correos,
+ * y un pie de página con información de contacto adicional.
+ * 
+ * @returns {JSX.Element} - Retorna el JSX para renderizar la página.
+ */
+export function Contact() {
+    // Hook para la traducción de textos
+    const { t } = useTranslation('Contact');
+    // Hook useRef para referirse al formulario
+    const form = useRef();
+
+    /**
+     * Maneja el envío del formulario de contacto.
+     * 
+     * @param {Object} e - Evento de envío del formulario.
+     */
+    const sendEmail = (e) => {
+        e.preventDefault(); // Previene el comportamiento por defecto del formulario
+
+        // Envía el formulario usando EmailJS
+        emailjs.sendForm('service_zepmoa7', 'template_dkuxlwd', form.current, 'nH6qu4CK3isTQlqZn')
+            .then((result) => {
+                console.log(result.text); // Imprime el resultado en consola
+                alert(t('emailSuccess')); // Muestra un mensaje de éxito
+            }, (error) => {
+                console.log(error.text); // Imprime el error en consola
+                alert(t('emailError')); // Muestra un mensaje de error
+            });
+    };
+
+    return (
+        &lt;div>
+            {/* Contenedor del encabezado */}
+            &lt;div className={styles.headerContainer}>
+                {/* Barra de navegación */}
+                &lt;div className={styles.navBa}>
+                    &lt;Navbar />
+                &lt;/div>
+                {/* Capa de superposición para efectos visuales */}
+                &lt;div className={styles.overlay}>&lt;/div>
+                {/* Contenido del encabezado */}
+                &lt;div className={styles.headerContent}>
+                    &lt;h1>{t('header.title')}&lt;/h1> {/* Título principal */}
+                &lt;/div>
+            &lt;/div>
+            
+            {/* Banner del formulario de contacto */}
+            &lt;div className={styles.banner}>
+                &lt;h3>{t('header.helpTitle')}&lt;/h3>
+            &lt;/div>
+            
+            {/* Contenedor del formulario */}
+            &lt;div className={styles.formContainer}>
+                &lt;form ref={form} onSubmit={sendEmail} className={styles.formulario}>
+                    {/* Fila de inputs para nombre y apellidos */}
+                    &lt;div className={styles.formRow}>
+                        &lt;div className={styles.inputGroup}>
+                            &lt;label htmlFor="nombre">{t('form.name')}&lt;/label>
+                            &lt;input type="text" id="nombre" name="nombre" required className={styles.inputText} placeholder={t('form.placeholderName')} />
+                        &lt;/div>
+                        &lt;div className={styles.inputGroup}>
+                            &lt;label htmlFor="apellidos">{t('form.surname')}&lt;/label>
+                            &lt;input type="text" id="apellidos" name="apellidos" required className={styles.inputText} placeholder={t('form.placeholderSurname')} />
+                        &lt;/div>
+                    &lt;/div>
+                    {/* Fila de inputs para correo y teléfono */}
+                    &lt;div className={styles.formRow}>
+                        &lt;div className={styles.inputGroup}>
+                            &lt;label htmlFor="correo">{t('form.email')}&lt;/label>
+                            &lt;input type="email" id="correo" name="correo" required className={styles.inputText} placeholder={t('form.placeholderEmail')} />
+                        &lt;/div>
+                        &lt;div className={styles.inputGroup}>
+                            &lt;label htmlFor="telefonos">{t('form.phone')}&lt;/label>
+                            &lt;input type="text" id="telefonos" name="telefonos" required className={styles.inputText} placeholder={t('form.placeholderPhone')} />
+                        &lt;/div>
+                    &lt;/div>
+                    {/* Fila de textarea para comentario */}
+                    &lt;div className={styles.formRow}>
+                        &lt;div className={`${styles.inputGroup} ${styles.fullWidth}`}>
+                            &lt;label htmlFor="comentario">{t('form.comment')}&lt;/label>
+                            &lt;textarea id="comentario" name="comentario" rows="5" required className={styles.textarea}>&lt;/textarea>
+                        &lt;/div>
+                    &lt;/div>
+                    {/* Botón de envío del formulario */}
+                    &lt;button type="submit" className={styles.submitButton}>{t('form.submitButton')}&lt;/button>
+                &lt;/form>
+            &lt;/div>
+
+            {/* Información adicional de contacto */}
+            &lt;div className={styles.infExtra}>
+                {/* Información de dirección */}
+                &lt;div className={styles.direccion}>
+                    &lt;div className={styles.headerTa}>
+                        &lt;h3>Direccion&lt;/h3>
+                    &lt;/div>
+                    &lt;div className={styles.texto}>
+                        &lt;p>CALLE VENUSTIANO CARRANZA #43 INTERIOR 3, COLONIA CENTRO C. P. 76850, AMEALCO DE BONFIL, QUERÉTARO.&lt;/p>
+                    &lt;/div>
+                &lt;/div>
+                {/* Información de teléfonos */}
+                &lt;div className={styles.telefonos}>
+                    &lt;div className={styles.telc}>
+                        &lt;div>
+                            &lt;h3>Telefono fijo&lt;/h3>
+                        &lt;/div>
+                        &lt;div>                            
+                            &lt;p>448-278-05-40&lt;/p>
+                        &lt;/div>
+                    &lt;/div>
+                    &lt;div className={styles.telc}>
+                        &lt;div>
+                            &lt;h3>Telefono celular&lt;/h3>
+                        &lt;/div>
+                        &lt;div>                            
+                            &lt;p>+52 1 427 277 7080&lt;/p>
+                        &lt;/div>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+
+            {/* Pie de página */}
+            &lt;Footer />
+        &lt;/div>
+    );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#About">About</a></li><li><a href="global.html#AffiliateAgencies">AffiliateAgencies</a></li><li><a href="global.html#Card">Card</a></li><li><a href="global.html#CardInfHome">CardInfHome</a></li><li><a href="global.html#Contact">Contact</a></li><li><a href="global.html#Details">Details</a></li><li><a href="global.html#EditProfileModal">EditProfileModal</a></li><li><a href="global.html#EmailVerification">EmailVerification</a></li><li><a href="global.html#Filtering">Filtering</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#ForgotPassword">ForgotPassword</a></li><li><a href="global.html#Gallery">Gallery</a></li><li><a href="global.html#Home">Home</a></li><li><a href="global.html#InfoExtra">InfoExtra</a></li><li><a href="global.html#Item">Item</a></li><li><a href="global.html#ItemList">ItemList</a></li><li><a href="global.html#Login">Login</a></li><li><a href="global.html#Modal">Modal</a></li><li><a href="global.html#Navbar">Navbar</a></li><li><a href="global.html#NewAgency">NewAgency</a></li><li><a href="global.html#News">News</a></li><li><a href="global.html#NewsInfo">NewsInfo</a></li><li><a href="global.html#OwnAgencys">OwnAgencys</a></li><li><a href="global.html#PaymentButton">PaymentButton</a></li><li><a href="global.html#Profile">Profile</a></li><li><a href="global.html#Projects">Projects</a></li><li><a href="global.html#Publicate">Publicate</a></li><li><a href="global.html#RegisterForm">RegisterForm</a></li><li><a href="global.html#Rutas">Rutas</a></li><li><a href="global.html#Terms">Terms</a></li><li><a href="global.html#Toolbar">Toolbar</a></li><li><a href="global.html#UserProfile">UserProfile</a></li><li><a href="global.html#VerifyPaymentStatus">VerifyPaymentStatus</a></li><li><a href="global.html#estadosMunicipios">estadosMunicipios</a></li><li><a href="global.html#fetchUserData">fetchUserData</a></li><li><a href="global.html#fetchUserObjects">fetchUserObjects</a></li><li><a href="global.html#handlePayment">handlePayment</a></li><li><a href="global.html#pedirObjetos">pedirObjetos</a></li><li><a href="global.html#resources">resources</a></li><li><a href="global.html#root">root</a></li><li><a href="global.html#useAuth">useAuth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 08 2024 18:03:39 GMT-0600 (hora estándar central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
